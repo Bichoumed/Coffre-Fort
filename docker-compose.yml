@@ -40,9 +40,34 @@ services:
     networks:
       - mayan-net
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - mayan-net
+    ports:
+      - "11434:11434"
+
+  ai-backend:
+    build: ./ai-backend
+    container_name: ai-backend
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    environment:
+      OLLAMA_URL: http://ollama:11434
+    ports:
+      - "9000:9000"
+    networks:
+      - mayan-net
+
 volumes:
   postgres_data:
   mayan_media:
+  ollama_data:
 
 networks:
   mayan-net:
